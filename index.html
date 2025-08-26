@@ -273,40 +273,45 @@
 
     <!-- Firebase SDK -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, where, orderBy, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyB0yE3sRAm6mGh-uPvps_wdyasCyYZeSnE",
-            authDomain: "zenithsoftes.firebaseapp.com",
-            projectId: "zenithsoftes",
-            storageBucket: "zenithsoftes.firebasestorage.app",
-            messagingSenderId: "939591825887",
-            appId: "1:939591825887:web:993f4a3a761950f047ac6a",
-            measurementId: "G-NDGL98T685"
-        };
-        
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        // Hacer disponibles las variables globalmente para app.js
-        window.firebase = {
-            auth,
-            db,
-            firestore: {
-                doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, where, orderBy, arrayUnion
-            },
-            authFunctions: {
-                onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword
-            }
-        };
-    </script>
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, where, orderBy, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyB0yE3sRAm6mGh-uPvps_wdyasCyYZeSnE",
+        authDomain: "zenithsoftes.firebaseapp.com",
+        projectId: "zenithsoftes",
+        storageBucket: "zenithsoftes.firebasestorage.app",
+        messagingSenderId: "939591825887",
+        appId: "1:939591825887:web:993f4a3a761950f047ac6a",
+        measurementId: "G-NDGL98T685"
+    };
+    
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    // Hacer disponibles las variables globalmente para app.js
+    window.firebase = {
+        auth,
+        db,
+        firestore: {
+            doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, where, orderBy, arrayUnion
+        },
+        authFunctions: {
+            onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword
+        }
+    };
 
-    <script src="app.js"></script>
+    // Mueve la carga de app.js aquí, después de que window.firebase esté definido
+    // Se utilizará un script con type="text/javascript" para evitar problemas de módulos
+    const appScript = document.createElement('script');
+    appScript.src = 'app.js';
+    appScript.type = 'text/javascript';
+    document.body.appendChild(appScript);
+</script>
 </body>
 </html>
