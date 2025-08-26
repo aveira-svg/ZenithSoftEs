@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOUNNE - Gestión de Eventos</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase App -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <!-- Pantalla de Login -->
+    <div id="login-screen" class="screen active">
+        <div class="login-container">
+            <h1 class="neon-text">FOUNNE</h1>
+            <p class="subtitle">Sistema de Gestión de Eventos</p>
+            
+            <form id="login-form">
+                <div class="input-group">
+                    <input type="email" id="email" placeholder="Correo electrónico" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Contraseña" required>
+                </div>
+                <button type="submit" class="btn-neon">Iniciar Sesión</button>
+            </form>
+            
+            <div id="login-error" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Aplicación Principal -->
+    <div id="app" class="screen">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="neon-text">FOUNNE</h1>
+            <div class="user-menu">
+                <span id="user-name"></span>
+                <button id="logout-btn" class="btn-neon-small">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <!-- Navegación -->
+        <nav class="main-nav">
+            <button class="nav-btn active" data-section="eventos">Eventos</button>
+            <button class="nav-btn" data-section="configuracion" id="config-btn">Configuración</button>
+            <button class="nav-btn" data-section="perfil">Mi Perfil</button>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <!-- Sección de Eventos -->
+            <section id="eventos-section" class="content-section active">
+                <div class="section-header">
+                    <h2>Eventos</h2>
+                    <div class="section-actions">
+                        <button id="new-event-btn" class="btn-neon">Nuevo Evento</button>
+                        <div class="filter-toggle">
+                            <label class="switch">
+                                <input type="checkbox" id="filter-personal">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Mostrar solo mis eventos</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="events-container" id="events-container">
+                    <!-- Los eventos se cargarán dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Sección de Configuración (solo admin) -->
+            <section id="configuracion-section" class="content-section">
+                <div class="section-header">
+                    <h2>Configuración</h2>
+                </div>
+                
+                <div class="admin-panels">
+                    <!-- Gestión de Usuarios -->
+                    <div class="admin-panel">
+                        <h3>Gestión de Usuarios</h3>
+                        <button id="new-user-btn" class="btn-neon">Nuevo Usuario</button>
+                        <div class="users-list" id="users-list">
+                            <!-- Los usuarios se cargarán dinámicamente -->
+                        </div>
+                    </div>
+                    
+                    <!-- Gestión de Artículos -->
+                    <div class="admin-panel">
+                        <h3>Artículos</h3>
+                        <button id="new-article-btn" class="btn-neon">Nuevo Artículo</button>
+                        <div class="items-list" id="articles-list">
+                            <!-- Los artículos se cargarán dinámicamente -->
+                        </div>
+                    </div>
+                    
+                    <!-- Gestión de Lugares -->
+                    <div class="admin-panel">
+                        <h3>Lugares</h3>
+                        <button id="new-place-btn" class="btn-neon">Nuevo Lugar</button>
+                        <div class="items-list" id="places-list">
+                            <!-- Los lugares se cargarán dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de Perfil -->
+            <section id="perfil-section" class="content-section">
+                <div class="section-header">
+                    <h2>Mi Perfil</h2>
+                </div>
+                
+                <div class="profile-info">
+                    <div class="info-group">
+                        <label>Email:</label>
+                        <span id="profile-email"></span>
+                    </div>
+                    <div class="info-group">
+                        <label>Rol:</label>
+                        <span id="profile-role"></span>
+                    </div>
+                    <div class="info-group">
+                        <label>Permisos:</label>
+                        <ul id="profile-permissions"></ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modales -->
+    <!-- Modal Nuevo Evento -->
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-event-title">Nuevo Evento</h2>
+            <form id="event-form">
+                <input type="hidden" id="event-id">
+                <div class="input-group">
+                    <label for="event-type">Tipo de Evento</label>
+                    <select id="event-type" required>
+                        <option value="FOUNNE">FOUNNE (Compartido)</option>
+                        <option value="Personal">Personal</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="event-title">Título</label>
+                    <input type="text" id="event-title" required>
+                </div>
+                <div class="input-group">
+                    <label for="event-place">Lugar</label>
+                    <select id="event-place" required>
+                        <!-- Se llenará dinámicamente -->
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="event-start">Fecha y Hora de Inicio</label>
+                    <input type="datetime-local" id="event-start" required>
+                </div>
+                <div class="input-group">
+                    <label for="event-end">Fecha y Hora de Fin</label>
+                    <input type="datetime-local" id="event-end" required>
+                </div>
+                <div class="input-group" id="articles-container">
+                    <label>Artículos Requeridos</label>
+                    <div id="articles-checkboxes">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Sub-eventos</label>
+                    <div id="subevents-container">
+                        <div class="subevent-item">
+                            <input type="text" placeholder="Título del subevento" class="subevent-input">
+                            <button type="button" class="remove-subevent">×</button>
+                        </div>
+                    </div>
+                    <button type="button" id="add-subevent" class="btn-neon-small">Añadir Subevento</button>
+                </div>
+                <button type="submit" class="btn-neon">Guardar Evento</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Usuario -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Nuevo Usuario</h2>
+            <form id="user-form">
+                <input type="hidden" id="user-id">
+                <div class="input-group">
+                    <label for="user-email">Email</label>
+                    <input type="email" id="user-email" required>
+                </div>
+                <div class="input-group">
+                    <label for="user-password">Contraseña</label>
+                    <input type="password" id="user-password" required>
+                </div>
+                <div class="input-group">
+                    <label for="user-role">Rol</label>
+                    <select id="user-role" required>
+                        <option value="usuario">Usuario</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Permisos</label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="permiso-crear"> Crear Eventos Personales
+                        </label>
+                        <label>
+                            <input type="checkbox" id="permiso-founne"> Administrar FOUNNE
+                        </label>
+                        <label>
+                            <input type="checkbox" id="permiso-lectura"> Solo Lectura
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn-neon">Guardar Usuario</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Artículo -->
+    <div id="article-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-article-title">Nuevo Artículo</h2>
+            <form id="article-form">
+                <input type="hidden" id="article-id">
+                <div class="input-group">
+                    <label for="article-name">Nombre</label>
+                    <input type="text" id="article-name" required>
+                </div>
+                <div class="input-group">
+                    <label for="article-type">Tipo</label>
+                    <select id="article-type" required>
+                        <option value="electrico">Eléctrico</option>
+                        <option value="fisico">Físico</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-neon">Guardar Artículo</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Lugar -->
+    <div id="place-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-place-title">Nuevo Lugar</h2>
+            <form id="place-form">
+                <input type="hidden" id="place-id">
+                <div class="input-group">
+                    <label for="place-name">Nombre</label>
+                    <input type="text" id="place-name" required>
+                </div>
+                <div class="input-group">
+                    <label for="place-sector">Sector</label>
+                    <select id="place-sector" required>
+                        <option value="Clinicas">Clínicas</option>
+                        <option value="Decanato">Decanato</option>
+                        <option value="FOUNNE">FOUNNE</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-neon">Guardar Lugar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
